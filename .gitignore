@@ -34,3 +34,5 @@ certificates/inApp/google.json
 
 # visual studio code settings
 .vscode/
+
+chaindata
