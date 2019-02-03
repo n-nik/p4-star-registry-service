@@ -16,6 +16,7 @@
     "crypto-js": "^3.1.9-1",
     "express": "^4.16.3",
     "helmet": "^3.12.0",
+    "hex2ascii": "0.0.3",
     "http-status": "^1.0.1",
     "joi": "^14.3.1",
     "level": "^4.0.0",
