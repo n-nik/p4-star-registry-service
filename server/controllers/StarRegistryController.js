@@ -1,7 +1,6 @@
 'use strict';
 const bitcoinMessage = require('bitcoinjs-message');
 const hex2ascii = require('hex2ascii');
-
 const validators = require('../validators');
 
 const Mempool = require('../helpers/MempoolHelper');
@@ -60,7 +59,7 @@ class StarRegistryController {
         const message = StarRegistryController._getMessage(address, requestTimeStamp);
 
         const isValid = bitcoinMessage.verify(message, address, req.body.signature);
-        if (!true) {
+        if (!isValid) {
             return res.status(400).send({message: 'Signature is not valid'});
         }
 
@@ -104,7 +103,7 @@ class StarRegistryController {
 
         blockchain.addBlock(new Block(body))
             .then(result => {
-                res.send(StarRegistryController._decodeData(result));
+                res.send(result);
             })
             .catch(err => {
                 console.log(err);
@@ -123,7 +122,8 @@ class StarRegistryController {
                 if (!block) {
                     return res.status(404).send({message: 'Block not found'});
                 }
-                res.send(StarRegistryController._decodeData(block));
+                block.body.star.storyDecoded = hex2ascii(block.body.star.story);
+                res.send(block);
             })
             .catch(err => {
                 console.log(err);
@@ -139,7 +139,8 @@ class StarRegistryController {
     static getByAddress(req, res, next) {
         blockchain.getBlockByAddress(req.params.address)
             .then(blocks => {
-                res.send(blocks.map(res.send(StarRegistryController._decodeData)));
+                blocks.forEach(b => b.body.star.storyDecoded = hex2ascii(b.body.star.story));
+                res.send(blocks);
             })
             .catch(err => {
                 console.log(err);
@@ -155,7 +156,8 @@ class StarRegistryController {
     static getByHeight(req, res, next) {
         blockchain.getBlock(req.params.height)
             .then(block => {
-                res.send(StarRegistryController._decodeData(block));
+                block.body.star.storyDecoded = hex2ascii(block.body.star.story);
+                res.send(block);
             })
             .catch(err => {
                 if (err.notFound) {
@@ -173,11 +175,6 @@ class StarRegistryController {
 
     static _getMessage(address, timestamp) {
         return `${address}:${timestamp}:starRegistry`
-    }
-
-    static _decodeData(block) {
-        block.body.star.story = hex2ascii(block.body.star.story);
-        return block;
     }
 
 }
