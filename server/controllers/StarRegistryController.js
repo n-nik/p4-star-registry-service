@@ -8,6 +8,7 @@ const BlockChain = require('../helpers/BlockChainHelper').Blockchain;
 const Block = require('../helpers/Block').Block;
 
 const TIMEOUT_REQUEST_WINDOW_TIME = require('../constants').TIMEOUT_REQUEST_WINDOW_TIME;
+const GENESIS_BLOCK_HEIGHT = require('../constants').GENESIS_BLOCK_HEIGHT;
 
 const verifyMempool = new Mempool(TIMEOUT_REQUEST_WINDOW_TIME);
 const validMempool = new Mempool();
@@ -103,6 +104,7 @@ class StarRegistryController {
 
         blockchain.addBlock(new Block(body))
             .then(result => {
+                validMempool.removeItem(req.body.address);
                 res.send(result);
             })
             .catch(err => {
@@ -156,7 +158,9 @@ class StarRegistryController {
     static getByHeight(req, res, next) {
         blockchain.getBlock(req.params.height)
             .then(block => {
-                block.body.star.storyDecoded = hex2ascii(block.body.star.story);
+                if (block.height !== GENESIS_BLOCK_HEIGHT) {
+                    block.body.star.storyDecoded = hex2ascii(block.body.star.story);
+                }
                 res.send(block);
             })
             .catch(err => {

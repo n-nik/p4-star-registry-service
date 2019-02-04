@@ -4,14 +4,24 @@
 
 const SHA256 = require('crypto-js/sha256');
 const LevelSandbox = require('./LevelSandboxHelper');
-const GENESIS_BLOCK_HEIGHT = 0;
+const Block = require('./Block').Block;
+const GENESIS_BLOCK_HEIGHT = require('../constants').GENESIS_BLOCK_HEIGHT;
 
 class Blockchain {
 
     constructor() {
         this.db = new LevelSandbox.LevelSandbox();
+        this.generateGenesisBlock();
     }
 
+    generateGenesisBlock(){
+        return this.getBlock(GENESIS_BLOCK_HEIGHT)
+            .catch(err => {
+                if (err.notFound) {
+                    return this.addBlock(new Block("First block in the chain - Genesis block"))
+                }
+            })
+    }
 
     /**
      * Get block height

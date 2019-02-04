@@ -9,7 +9,6 @@ class Mempool {
 
     /**
      * @param {string} address
-     * @param {boolean} timeout
      * @returns {{requestTimeStamp: number, address: string}}
      */
     getOrCreateItem(address) {
@@ -32,7 +31,6 @@ class Mempool {
      */
     createItem(item) {
         this.mempool.push(item);
-        console.log(this.mempool);
 
         if (this.timeout) {
             this.timeoutRequests[item.address]= setTimeout(() => this.removeItem(item.address), this.timeout);
